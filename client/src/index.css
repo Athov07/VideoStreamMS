@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#0F0F0F] text-[#F1F1F1] antialiased;
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply w-full bg-transparent border border-[#3F3F3F] focus:border-blue-500 outline-none text-white px-4 py-2 rounded-md transition-colors;
+  }
+}
+
+@layer components {
+  .btn-next {
+    @apply bg-[#065fd4] hover:bg-[#0556bf] text-white font-medium 
+    py-2 px-6 rounded-full transition-all duration-200 
+    disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed
+    text-sm tracking-wide shadow-sm active:scale-95;
+  }
+}
