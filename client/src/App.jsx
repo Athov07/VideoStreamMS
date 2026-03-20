@@ -1,15 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import AuthCallback from './pages/AuthCallback';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import AuthCallback from "./pages/AuthCallback";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import Home from "./pages/dashboard/Home";
 
-const Dashboard = () => (
-  <div className="min-h-screen bg-background text-white flex items-center justify-center">
-    <h1 className="text-3xl font-bold">Welcome to VideoStream Dashboard 📺</h1>
-  </div>
-);
 
 function App() {
   return (
@@ -20,12 +22,22 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/register" element={<Register />} />
-          
+
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-             <Route path="/dashboard" element={<Dashboard />} />
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<Home />} />
+              <Route
+                path="/dashboard/my-videos"
+                element={<div>My Videos Content</div>}
+              />
+              <Route
+                path="/dashboard/profile"
+                element={<div>Profile Settings</div>}
+              />
+            </Route>
+
           </Route>
-          
           {/* Default Redirect */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
