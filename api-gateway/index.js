@@ -26,21 +26,31 @@ const authProxy = createProxyMiddleware({
   }
 });
 
-// Future Video Service Proxy
-// const videoProxy = createProxyMiddleware({
-//   target: process.env.VIDEO_SERVICE_URL,
-//   changeOrigin: true,
-//   onError: (err, req, res) => {
-//     res.status(502).json({ message: "Video Service is currently unreachable." });
-//   }
-// });
+//Future Video Service Proxy
+const videoProxy = createProxyMiddleware({
+  target: process.env.VIDEO_SERVICE_URL, // http://localhost:5500
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/videos': '', 
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy Error:', err.message);
+    res.status(502).json({ 
+        message: 'Video Service is unreachable. Make sure it is running on port 5500.',
+        error: err.message 
+    });
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`[Gateway]: Forwarding ${req.method} ${req.url} -> ${process.env.VIDEO_SERVICE_URL}${proxyReq.path}`);
+  }
+});
 
 // 3. Apply Proxies
 // Any request starting with /api/auth goes to the Auth Microservice
 app.use('/api/auth', authProxy);
 
 // Any request starting with /api/videos goes to the Video Microservice
-// app.use('/api/videos', videoProxy);
+app.use('/api/videos', videoProxy);
 
 // 4. Health Check Route
 app.get('/health', (req, res) => {

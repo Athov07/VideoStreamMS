@@ -11,6 +11,7 @@ import AuthCallback from "./pages/AuthCallback";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Home from "./pages/dashboard/Home";
+import VideoDetails from "./pages/dashboard/VideoDetails";
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
                 path="/dashboard/profile"
                 element={<div>Profile Settings</div>}
               />
+              <Route path="/watch/:id" element={<VideoDetails />} />
             </Route>
 
           </Route>
