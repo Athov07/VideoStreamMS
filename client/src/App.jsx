@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Home from "./pages/dashboard/Home";
 import VideoDetails from "./pages/dashboard/VideoDetails";
+import VideoManager from "./pages/dashboard/VideoManager";
 
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
               <Route path="/dashboard" element={<Home />} />
               <Route
                 path="/dashboard/my-videos"
-                element={<div>My Videos Content</div>}
+                element={<VideoManager/>}
               />
               <Route
                 path="/dashboard/profile"
