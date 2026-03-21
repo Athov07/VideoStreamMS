@@ -43,5 +43,20 @@ export const videoService = {
       headers: getAuthHeader(),
     });
     return response.data;
-  }
+  },
+
+  // 5. Edit Video
+  editVideo: async (id, updateData) => {
+    const isFormData = updateData instanceof FormData;
+    
+    const response = await axios.patch(`${API_URL}/update/${id}`, updateData, {
+      headers: {
+        ...getAuthHeader(),
+        'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
+      },
+    });
+    return response.data;
+  },
+
+
 };
