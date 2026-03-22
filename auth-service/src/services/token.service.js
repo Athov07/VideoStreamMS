@@ -5,6 +5,7 @@ export const generateTokens = (user) => {
     const accessToken = jwt.sign(
         { 
             id: user._id, 
+            username: user.username,
             role: user.role,
             email: user.email 
         },
