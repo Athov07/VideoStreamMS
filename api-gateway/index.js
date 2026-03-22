@@ -1,11 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-dotenv.config();
 
 const app = express();
 
