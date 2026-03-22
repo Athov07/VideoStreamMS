@@ -13,6 +13,7 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 import Home from "./pages/dashboard/Home";
 import VideoDetails from "./pages/dashboard/VideoDetails";
 import MyVideos from './pages/dashboard/MyVideos';
+import Profile from "./pages/dashboard/Profile";
 
 
 function App() {
@@ -35,7 +36,7 @@ function App() {
               />
               <Route
                 path="/dashboard/profile"
-                element={<div>Profile Settings</div>}
+                element={<Profile/>}
               />
               <Route path="/watch/:id" element={<VideoDetails />} />
             </Route>

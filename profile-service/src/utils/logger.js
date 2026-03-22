@@ -20,7 +20,6 @@ export const logActivity = async (userId, action, targetId = null, details = "")
         }
 
         const log = await AuditLog.create(logData);
-        console.log(" Audit Log Saved:", log._id);
     } catch (error) {
         console.error(" Audit Log Error:", error.message);
     }

@@ -12,7 +12,8 @@ app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
 
 // Routes
-app.use('/api/profile', profileRoutes);
+// app.use('/api/profile', profileRoutes);
+app.use('/', profileRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 
 // Global Error Handler (Must be last)

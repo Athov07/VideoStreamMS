@@ -14,7 +14,7 @@ app.use(helmet());
 app.use(cors());   
 app.use(morgan('dev')); 
 
-// 2. Define Proxy Routes
+// auth Proxy Routes
 const authProxy = createProxyMiddleware({
   target: process.env.AUTH_SERVICE_URL,
   changeOrigin: true,
@@ -26,7 +26,7 @@ const authProxy = createProxyMiddleware({
   }
 });
 
-//Future Video Service Proxy
+// Video Service Proxy
 const videoProxy = createProxyMiddleware({
   target: process.env.VIDEO_SERVICE_URL, // http://localhost:5500
   changeOrigin: true,
@@ -45,12 +45,25 @@ const videoProxy = createProxyMiddleware({
   }
 });
 
-// 3. Apply Proxies
-// Any request starting with /api/auth goes to the Auth Microservice
+// Define Profile Service Proxy
+const profileProxy = createProxyMiddleware({
+  target: process.env.PROFILE_SERVICE_URL, //http://localhost:6000
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/profile': '', 
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`[Gateway]: Forwarding ${req.method} ${req.url} -> Profile Service`);
+  }
+});
+
+// Apply Proxy
+
 app.use('/api/auth', authProxy);
 
-// Any request starting with /api/videos goes to the Video Microservice
 app.use('/api/videos', videoProxy);
+
+app.use('/api/profile', profileProxy);
 
 // 4. Health Check Route
 app.get('/health', (req, res) => {
