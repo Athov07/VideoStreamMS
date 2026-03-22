@@ -13,7 +13,7 @@ const auditLogSchema = new mongoose.Schema({
     },
     targetId: { 
         type: mongoose.Schema.Types.ObjectId, 
-        required: false // The ID of the Profile or Subscription being affected
+        required: false 
     },
     details: { 
         type: String, 

@@ -53,8 +53,7 @@ updateProfile: async (userId, updateData, file) => {
             // even if the old image deletion fails.
         }
 
-        // 2. Apply Transformation via URL (Since we removed it from storage.js)
-        // This injects the crop/resize instructions directly into the URL string
+        
         finalUpdate.avatar = file.path.replace('/upload/', '/upload/w_500,h_500,c_fill,g_face/');
     }
 
