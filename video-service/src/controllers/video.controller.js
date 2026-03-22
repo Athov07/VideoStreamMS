@@ -60,3 +60,26 @@ export const updateVideo = asyncHandler(async (req, res) => {
         data: updatedVideo
     });
 });
+
+
+
+export const getMyVideos = asyncHandler(async (req, res) => {
+    console.log("Fetching studio content for User ID:", req.user._id);
+
+    // Use the service instead of calling Video.find directly
+    const videos = await videoService.getVideosByOwner(req.user._id);
+
+    if (!videos || videos.length === 0) {
+        return res.status(200).json({
+            success: true,
+            data: [],
+            message: "No videos found. Start uploading!"
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        count: videos.length,
+        data: videos
+    });
+});

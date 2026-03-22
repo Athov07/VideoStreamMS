@@ -37,6 +37,13 @@ export const videoService = {
     return response.data;
   },
 
+  getMyVideos: async () => {
+    const response = await axios.get(`${API_URL}/my-videos`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  },
+
   // 4. Delete Video
   deleteVideo: async (id) => {
     const response = await axios.delete(`${API_URL}/${id}`, {
