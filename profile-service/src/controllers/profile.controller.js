@@ -46,3 +46,21 @@ export const deleteMyProfile = asyncHandler(async (req, res) => {
         data: {}
     });
 });
+
+
+
+export const getBatchProfiles = asyncHandler(async (req, res) => {
+    const { userIds } = req.query; // Expects "id1,id2,id3"
+
+    if (!userIds) {
+        return res.status(200).json({ success: true, data: [] });
+    }
+
+    const idsArray = userIds.split(",");
+    const profiles = await profileService.getBatchProfiles(idsArray);
+
+    res.status(200).json({
+        success: true,
+        data: profiles
+    });
+});

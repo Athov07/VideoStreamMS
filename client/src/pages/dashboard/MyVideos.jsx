@@ -102,9 +102,9 @@ const MyVideos = () => {
             <p className="font-medium animate-pulse">Syncing your content...</p>
           </div>
         ) : filteredVideos.length > 0 ? (
-          <div className="bg-surface/30 border border-background-accent rounded-2xl overflow-hidden space-y-2">
+          <div className="bg-surface/30 border-background-accent rounded-xl overflow-hidden space-y-2">
             {filteredVideos.map((v, index) => (
-              <div key={v._id?.$oid || v._id} className={index !== 0 ? "border-t border-background-accent" : ""}>
+              <div key={v._id?.$oid || v._id} className={index !== 0 ? " border-background-accent" : ""}>
                 <VideoManager 
                   video={v} 
                   onUpdate={fetchVideos} 

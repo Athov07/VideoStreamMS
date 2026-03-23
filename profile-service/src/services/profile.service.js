@@ -93,5 +93,15 @@ updateProfile: async (userId, updateData, file) => {
     }
 
     return deleted;
-}
+},
+
+getBatchProfiles: async (userIdsArray) => {
+    if (!userIdsArray || userIdsArray.length === 0) return [];
+
+    const profiles = await Profile.find({
+        userId: { $in: userIdsArray }
+    }).select("userId username avatar");
+
+    return profiles;
+},
 };

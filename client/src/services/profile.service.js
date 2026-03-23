@@ -14,6 +14,11 @@ export const profileService = {
     return response.data;
   },
 
+  getBatchProfiles: async (userIds) => {
+    const response = await axios.get(`${API_URL}/batch?userIds=${userIds}`, getAuthHeader());
+    return response.data;
+  },
+
   updateProfile: async (formData) => {
     const token = localStorage.getItem("accessToken"); // Double-check this key!
     const response = await axios.patch(`${API_URL}/update`, formData, {
@@ -47,4 +52,5 @@ export const profileService = {
     const response = await axios.get(`${API_URL}/subscribers/${channelId}`);
     return response.data;
   },
+
 };

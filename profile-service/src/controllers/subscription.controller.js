@@ -71,12 +71,6 @@ export const getChannelSubscribers = asyncHandler(async (req, res) => {
 
     const isMe = currentUserId ? String(currentUserId) === String(channelId) : false;
 
-    console.log("COMPARING:", { 
-        fromToken: currentUserId, 
-        fromUrl: channelId, 
-        match: isMe 
-    });
-
     let isSubscribedByMe = false;
     if (!isMe && currentUserId) {
         const myProfile = await Profile.findOne({ userId: currentUserId });
