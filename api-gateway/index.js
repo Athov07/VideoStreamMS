@@ -70,6 +70,18 @@ const subscriptionProxy = createProxyMiddleware({
   }
 });
 
+// Define specific interaction Proxy
+const interactionProxy = createProxyMiddleware({
+  target: process.env.INTERACTION_SERVICE_URL || 'http://localhost:6500',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/interactions': '', 
+  },
+  onProxyReq: (proxyReq, req) => {
+    console.log(`[Gateway]: Interaction Action -> ${req.method} ${proxyReq.path}`);
+  }
+});
+
 // Apply Proxy
 
 app.use('/api/auth', authProxy);
@@ -79,6 +91,8 @@ app.use('/api/videos', videoProxy);
 app.use('/api/profile', profileProxy);
 
 app.use('/api/subscription', subscriptionProxy);
+
+app.use('/api/interactions', interactionProxy);
 
 // 4. Health Check Route
 app.get('/health', (req, res) => {

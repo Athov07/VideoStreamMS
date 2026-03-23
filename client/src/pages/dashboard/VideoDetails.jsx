@@ -4,6 +4,8 @@ import { videoService } from "../../services/video.service.js";
 import { profileService } from "../../services/profile.service.js"; 
 import { subscriptionService } from "../../services/subscription.service.js";
 import { Play, Loader2, Eye, Calendar } from "lucide-react";
+import LikeButtons from "../dashboard/VideoInteractions.jsx";
+import CommentSection from "../dashboard/CommentSection.jsx";
 
 const VideoDetails = () => {
   const { id } = useParams();
@@ -128,6 +130,7 @@ const VideoDetails = () => {
           <h1 className="text-lg lg:text-lg font-medium text-white tracking-tight">
             {video.title}
           </h1>
+            <LikeButtons videoId={id} />
 
           {/* PROFILE BAR */}
           <div className="mt-6 py-6 border-t border-b border-white/10 flex items-center justify-between">
@@ -143,6 +146,7 @@ const VideoDetails = () => {
                   {channel?.subscriberCount ?? 0} subscribers
                 </p>
               </div>
+              
             </div>
 
             {channel && channel.isMe === false && (
@@ -163,6 +167,7 @@ const VideoDetails = () => {
             </div>
             <p className="text-zinc-400 text-[15px] leading-relaxed font-normal opacity-90 whitespace-pre-wrap">{video.description}</p>
           </div>
+          <CommentSection videoId={id} />
         </div>
       </div>
 
