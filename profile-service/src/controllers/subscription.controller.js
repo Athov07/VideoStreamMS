@@ -5,59 +5,96 @@ import { ApiError } from "../utils/ApiError.js";
 import { logActivity } from "../utils/logger.js";
 import mongoose from "mongoose";
 
+
 export const toggleSubscription = asyncHandler(async (req, res) => {
-    const { channelId } = req.params;
+    const { channelId } = req.params; 
     const subscriberUserId = req.user.id; 
 
-    // 1. Validate channelId format
-    if (!mongoose.Types.ObjectId.isValid(channelId)) {
-        throw new ApiError(400, "Invalid Channel ID format");
+    const myProfile = await Profile.findOne({ userId: subscriberUserId });
+    const targetProfile = await Profile.findOne({ userId: channelId });
+
+    if (!myProfile || !targetProfile) {
+        throw new ApiError(404, "Profile not found");
     }
 
-    const subscriberProfile = await Profile.findOne({ userId: subscriberUserId });
-    if (!subscriberProfile) throw new ApiError(404, "Your profile not found");
-
-    // 2. Prevent Self-Subscription
-    if (subscriberProfile._id.toString() === channelId) {
-        throw new ApiError(400, "You cannot subscribe to your own channel");
+    if (myProfile._id.equals(targetProfile._id)) {
+        throw new ApiError(400, "You cannot subscribe to yourself");
     }
 
     const existingSub = await Subscription.findOne({
-        subscriberId: subscriberProfile._id,
-        channelId
+        subscriberId: myProfile._id,
+        channelId: targetProfile._id
     });
 
     if (existingSub) {
-        // Unsubscribe
         await Subscription.findByIdAndDelete(existingSub._id);
-        await Profile.findByIdAndUpdate(channelId, { $inc: { subscriberCount: -1 } });
         
-        // Use subscriberProfile._id for safe logging
-        await logActivity(subscriberProfile._id, 'UNSUBSCRIBED', channelId, "Unfollowed channel");
-        
+        targetProfile.subscriberCount = Math.max(0, targetProfile.subscriberCount - 1);
+        await targetProfile.save();
+
+        await logActivity(
+            subscriberUserId, 
+            'UNSUBSCRIBED', 
+            channelId, 
+            `User ${myProfile.username} unfollowed ${targetProfile.username}`
+        );
+
         return res.status(200).json({ success: true, message: "Unsubscribed" });
     }
 
-    // Subscribe
-    const newSub = await Subscription.create({
-        subscriberId: subscriberProfile._id,
-        channelId
+    await Subscription.create({
+        subscriberId: myProfile._id,
+        channelId: targetProfile._id
     });
     
-    await Profile.findByIdAndUpdate(channelId, { $inc: { subscriberCount: 1 } });
-    
-    // Log the activity
-    await logActivity(subscriberProfile._id, 'SUBSCRIBED', channelId, "Followed channel");
+    targetProfile.subscriberCount += 1;
+    await targetProfile.save();
 
-    res.status(201).json({ success: true, data: newSub });
+    await logActivity(
+        subscriberUserId, 
+        'SUBSCRIBED', 
+        channelId, 
+        `User ${myProfile.username} followed ${targetProfile.username}`
+    );
+
+    res.status(201).json({ success: true, message: "Subscribed successfully" });
 });
 
-export const getChannelSubscribers = asyncHandler(async (req, res) => {
-    const { channelId } = req.params;
-    
-    // Get all subs and populate the subscriber profile details
-    const subscribers = await Subscription.find({ channelId })
-        .populate("subscriberId", "username avatar");
 
-    res.status(200).json({ success: true, data: subscribers });
+export const getChannelSubscribers = asyncHandler(async (req, res) => {
+    const { channelId } = req.params; 
+    
+    const currentUserId = req.user?.id || req.user?._id; 
+
+    const targetProfile = await Profile.findOne({ userId: channelId });
+    if (!targetProfile) throw new ApiError(404, "Profile not found");
+
+    const isMe = currentUserId ? String(currentUserId) === String(channelId) : false;
+
+    console.log("COMPARING:", { 
+        fromToken: currentUserId, 
+        fromUrl: channelId, 
+        match: isMe 
+    });
+
+    let isSubscribedByMe = false;
+    if (!isMe && currentUserId) {
+        const myProfile = await Profile.findOne({ userId: currentUserId });
+        if (myProfile) {
+            const sub = await Subscription.findOne({
+                subscriberId: myProfile._id,
+                channelId: targetProfile._id
+            });
+            isSubscribedByMe = !!sub;
+        }
+    }
+
+    res.status(200).json({
+        success: true,
+        data: {
+            ...targetProfile._doc,
+            isMe,
+            isSubscribedByMe
+        }
+    });
 });

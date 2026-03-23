@@ -5,6 +5,6 @@ import { verifyJWT } from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
 router.post('/subscribe/:channelId', verifyJWT, toggleSubscription);
-router.get('/subscribers/:channelId', getChannelSubscribers);
+router.get('/subscribers/:channelId', verifyJWT, getChannelSubscribers);
 
 export default router;

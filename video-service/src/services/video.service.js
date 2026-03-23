@@ -34,14 +34,19 @@ export const videoService = {
    * GET ALL VIDEOS
    */
   getAllVideos: async () => {
-    return await Video.find().sort({ createdAt: -1 });
+    return await Video.find()
+      .sort({ createdAt: -1 })
+      .populate("owner", "username");
   },
 
   /**
    * GET VIDEO BY ID
    */
   getVideoById: async (id, userId) => {
-    const video = await Video.findById(id);
+    const video = await Video.findById(id).populate(
+      "owner",
+      "username firstName lastName",
+    );
     if (video && userId) {
       // AUDIT LOG (Optional: tracking views)
       await logActivity(userId, "VIDEO_VIEW", id, `Viewed: ${video.title}`);

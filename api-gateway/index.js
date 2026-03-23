@@ -57,6 +57,19 @@ const profileProxy = createProxyMiddleware({
   }
 });
 
+
+// Define specific Subscribers Proxy
+const subscriptionProxy = createProxyMiddleware({
+  target: process.env.PROFILE_SERVICE_URL, 
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/subscription': '', 
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`[Gateway]: Subscription Action -> ${req.method} ${proxyReq.path}`);
+  }
+});
+
 // Apply Proxy
 
 app.use('/api/auth', authProxy);
@@ -64,6 +77,8 @@ app.use('/api/auth', authProxy);
 app.use('/api/videos', videoProxy);
 
 app.use('/api/profile', profileProxy);
+
+app.use('/api/subscription', subscriptionProxy);
 
 // 4. Health Check Route
 app.get('/health', (req, res) => {
