@@ -37,11 +37,15 @@ const Login = () => {
       if (data.isNewUser) {
         // 1. Save email to storage so Register.jsx can ALWAYS find it
         localStorage.setItem("pendingEmail", email);
+        
 
         // 2. Navigate to register
         navigate("/register");
       } else {
         localStorage.setItem("accessToken", data.accessToken);
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
         navigate("/dashboard");
       }
     } catch (err) {

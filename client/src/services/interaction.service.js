@@ -34,6 +34,14 @@ export const interactionService = {
     });
     return response.data;
   },
+  updateComment: async (commentId, data) => {
+    const response = await axios.patch(
+      `${API_URL}/comments/${commentId}`, 
+      data, 
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  },
   deleteComment: async (commentId) => {
     const response = await axios.delete(`${API_URL}/comments/${commentId}`, {
       headers: getAuthHeader()
