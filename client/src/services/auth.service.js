@@ -8,6 +8,11 @@ export const authService = {
     const response = await axios.post(`${API_URL}/send-otp`, { email });
     return response.data;
   },
+
+  resendOtp: async (email) => {
+    const response = await axios.post(`${API_URL}/resend-otp`, { email });
+    return response.data;
+  },
   
   verifyOtp: async (email, otp) => {
     const response = await axios.post(`${API_URL}/verify-otp`, { email, otp });
