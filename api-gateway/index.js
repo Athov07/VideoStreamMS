@@ -82,6 +82,16 @@ const interactionProxy = createProxyMiddleware({
   }
 });
 
+
+// api-gateway index.js
+const adminProxy = createProxyMiddleware({
+  target: process.env.AUTH_SERVICE_URL, // Points to Auth Service
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/admin': '/admin', 
+  },
+});
+
 // Apply Proxy
 
 app.use('/api/auth', authProxy);
@@ -93,6 +103,8 @@ app.use('/api/profile', profileProxy);
 app.use('/api/subscription', subscriptionProxy);
 
 app.use('/api/interactions', interactionProxy);
+
+app.use('/api/admin', adminProxy);
 
 // 4. Health Check Route
 app.get('/health', (req, res) => {

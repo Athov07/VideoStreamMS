@@ -67,8 +67,13 @@ const Login = () => {
         navigate("/register");
       } else {
         localStorage.setItem("accessToken", data.accessToken);
-        if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/dashboard");
+        if (data.user){localStorage.setItem("user", JSON.stringify(data.user));
+        if (data.user.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/dashboard");
+          }
+          } 
       }
     } catch (err) {
       alert("Invalid OTP or Session Expired");

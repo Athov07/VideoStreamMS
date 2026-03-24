@@ -39,7 +39,7 @@ const LikeButtons = ({ videoId }) => {
   };
 
   return (
-    <div className="flex items-center mt-5">
+    <div className="flex items-centermt mt-5">
         <div className="inline-flex items-center bg-zinc-800/80 hover:bg-zinc-800 rounded-full border border-white/10 overflow-hidden">
       {/* LIKE BUTTON */}
       <button 

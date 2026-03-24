@@ -5,6 +5,7 @@ import cors from 'cors';
 import passport from './config/passport.js';
 import authRoutes from './routes/auth.routes.js';
 import errorMiddleware from './middlewares/error.middleware.js';
+import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 
@@ -22,6 +23,9 @@ app.use(passport.initialize());
 // Routes
 // app.use('/api/auth', authRoutes);
 app.use('/', authRoutes);
+// app.use('/', adminRoutes);
+app.use('/admin', adminRoutes);
+
 
 // Error Handler
 app.use(errorMiddleware);

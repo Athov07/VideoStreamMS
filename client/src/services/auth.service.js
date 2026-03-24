@@ -26,5 +26,21 @@ export const authService = {
 
   googleLogin: () => {
     window.location.href = `${API_URL}/google`;
+  },
+
+  getCurrentUser: () => {
+    const userString = localStorage.getItem("user");
+    try {
+      return userString ? JSON.parse(userString) : null;
+    } catch (error) {
+      console.error("Error parsing user from localStorage", error);
+      return null;
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    window.location.href = "/login";
   }
 };
