@@ -92,17 +92,6 @@ const adminAuthProxy = createProxyMiddleware({
   },
 });
 
-const videoAdminProxy = createProxyMiddleware({
-  target: process.env.VIDEO_SERVICE_URL || 'http://localhost:5500',
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api/admin/videos': '/admin', 
-  },
-  onProxyReq: (proxyReq, req, res) => {
-    console.log(`[Gateway]: Admin Video Action -> ${req.method} ${proxyReq.path}`);
-  }
-});
-
 
 // Apply Proxy
 
@@ -118,7 +107,6 @@ app.use('/api/interactions', interactionProxy);
 
 app.use('/api/admin', adminAuthProxy);
 
-app.use('/api/admin/videos', videoAdminProxy);
 
 
 // 4. Health Check Route

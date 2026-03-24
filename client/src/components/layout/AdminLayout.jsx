@@ -25,7 +25,7 @@ const AdminLayout = () => {
     { to: "/admin/dashboard", label: "Overview", icon: <LayoutDashboard size={20}/> },
     { to: "/admin/users", label: "Manage Users", icon: <Users size={20}/> },
     { to: "/admin/videos", label: "Video Moderation", icon: <Video size={20}/> },
-    { to: "/admin/logs", label: "Audit Logs", icon: <ShieldAlert size={20}/> },
+    { to: "/admin/profiles", label: "Audit Logs", icon: <Users size={20}/> },
     { to: "/dashboard", label: "User View", icon: <Settings size={20}/> }, // Switch back to user view
   ];
 

@@ -29,5 +29,33 @@ export const adminService = {
     togglePremium: async (videoId) => {
         const res = await axios.patch(`${API_URL}/videos/admin/${videoId}/premium`, {}, getHeaders());
         return res.data;
+    },
+    // --- Profile Service Admin Calls (New) ---
+
+    getAllProfiles: async () => {
+        const res = await axios.get(`${API_URL}/profile/admin/profiles/all`, getHeaders());
+        return res.data;
+    },
+
+    updateProfileByAdmin: async (profileId, updateData) => {
+        const res = await axios.patch(
+            `${API_URL}/profile/admin/profiles/${profileId}`, 
+            updateData, 
+            getHeaders()
+        );
+        return res.data;
+    },
+
+    getSubscriptionStats: async () => {
+        const res = await axios.get(`${API_URL}/profile/admin/subscriptions/stats`, getHeaders());
+        return res.data;
+    },
+
+    removeSubscriberByAdmin: async (subscriptionId) => {
+        const res = await axios.delete(
+            `${API_URL}/profile/admin/subscriptions/${subscriptionId}`, 
+            getHeaders()
+        );
+        return res.data;
     }
 };

@@ -23,7 +23,7 @@ app.use(passport.initialize());
 // Routes
 // app.use('/api/auth', authRoutes);
 app.use('/', authRoutes);
-// app.use('/', adminRoutes);
+
 app.use('/admin', adminRoutes);
 
 

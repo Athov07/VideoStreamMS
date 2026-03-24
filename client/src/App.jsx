@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLayout from "./components/layout/AdminLayout";
 import ManageUsers from "./pages/admin/ManageUsers"
 import AdminContent from "./pages/admin/AdminContent"
+import ManageProfiles from './pages/admin/ManageProfiles';
 
 
 function App() {
@@ -52,6 +53,8 @@ function App() {
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/users" element={<ManageUsers />} />
               <Route path="/admin/videos" element={<AdminContent />} />
+              <Route path="/admin/videos" element={<AdminContent />} />
+              <Route path="/admin/profiles" element={<ManageProfiles />} />
             </Route>
           </Route>
 
