@@ -84,13 +84,25 @@ const interactionProxy = createProxyMiddleware({
 
 
 // api-gateway index.js
-const adminProxy = createProxyMiddleware({
+const adminAuthProxy = createProxyMiddleware({
   target: process.env.AUTH_SERVICE_URL, // Points to Auth Service
   changeOrigin: true,
   pathRewrite: {
     '^/api/admin': '/admin', 
   },
 });
+
+const videoAdminProxy = createProxyMiddleware({
+  target: process.env.VIDEO_SERVICE_URL || 'http://localhost:5500',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/admin/videos': '/admin', 
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`[Gateway]: Admin Video Action -> ${req.method} ${proxyReq.path}`);
+  }
+});
+
 
 // Apply Proxy
 
@@ -104,7 +116,10 @@ app.use('/api/subscription', subscriptionProxy);
 
 app.use('/api/interactions', interactionProxy);
 
-app.use('/api/admin', adminProxy);
+app.use('/api/admin', adminAuthProxy);
+
+app.use('/api/admin/videos', videoAdminProxy);
+
 
 // 4. Health Check Route
 app.get('/health', (req, res) => {

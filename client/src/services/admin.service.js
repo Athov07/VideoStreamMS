@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api';
+// const VIDEO_API = 'http://localhost:8000/api/videos/admin';
 
 const getHeaders = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
@@ -11,8 +12,22 @@ export const adminService = {
         const res = await axios.get(`${API_URL}/auth/admin/users`, getHeaders());
         return res.data;
     },
+
     updateUserRole: async (userId, newRole) => {
         const res = await axios.patch(`${API_URL}/auth/admin/users/role`, { userId, newRole }, getHeaders());
+        return res.data;
+    },
+
+    getAllVideos: async () => {
+        const res = await axios.get(`${API_URL}/videos/admin/all`, getHeaders());
+        return res.data;
+    },
+    deleteVideo: async (videoId) => {
+        const res = await axios.delete(`${API_URL}/videos/admin/${videoId}`, getHeaders());
+        return res.data;
+    },
+    togglePremium: async (videoId) => {
+        const res = await axios.patch(`${API_URL}/videos/admin/${videoId}/premium`, {}, getHeaders());
         return res.data;
     }
 };

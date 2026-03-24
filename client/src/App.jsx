@@ -17,6 +17,7 @@ import Profile from "./pages/dashboard/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLayout from "./components/layout/AdminLayout";
 import ManageUsers from "./pages/admin/ManageUsers"
+import AdminContent from "./pages/admin/AdminContent"
 
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
             <Route element={<AdminLayout />}> 
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/users" element={<ManageUsers />} />
+              <Route path="/admin/videos" element={<AdminContent />} />
             </Route>
           </Route>
 

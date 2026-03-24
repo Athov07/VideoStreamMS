@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import videoRoutes from './routes/video.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(morgan('dev'));
 
 // app.use('/api/videos', videoRoutes);
 app.use('/', videoRoutes);
+app.use('/admin', adminRoutes);
 
 app.use(errorMiddleware);
 
