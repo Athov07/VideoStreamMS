@@ -8,6 +8,7 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 // Import Routes
 import likeRoutes from "./routes/like.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 // app.use("/", commentRoutes);
 app.use("/likes", likeRoutes);
 app.use("/comments", commentRoutes);
+app.use("/admin", adminRoutes);
 
 // Health Check (Optional but recommended for Microservices)
 app.get("/health", (req, res) => {

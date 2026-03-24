@@ -19,6 +19,7 @@ import AdminLayout from "./components/layout/AdminLayout";
 import ManageUsers from "./pages/admin/ManageUsers"
 import AdminContent from "./pages/admin/AdminContent"
 import ManageProfiles from './pages/admin/ManageProfiles';
+import ManageInteractions from './pages/admin/ManageInteractions';
 
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
               <Route path="/admin/videos" element={<AdminContent />} />
               <Route path="/admin/videos" element={<AdminContent />} />
               <Route path="/admin/profiles" element={<ManageProfiles />} />
+              <Route path="/admin/interactions" element={<ManageInteractions />} />
             </Route>
           </Route>
 

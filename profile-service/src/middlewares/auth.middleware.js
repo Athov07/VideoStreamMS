@@ -15,11 +15,10 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
         // 3. ATTACH THE PAYLOAD DIRECTLY
-        // This contains id, username, email, role because you added them in auth-service
         req.user = decodedToken; 
-        
         next();
     } catch (error) {
+        console.log("JWT Verify Error Detail:", error.message);
         throw new ApiError(401, "Invalid Access Token");
     }
 });

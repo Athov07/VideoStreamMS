@@ -8,7 +8,10 @@ import {
   ShieldAlert, 
   LogOut, 
   Search,
-  Settings
+  Settings,
+  UserCog,
+  Activity,
+  BadgeIndianRupee
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -23,9 +26,11 @@ const AdminLayout = () => {
 
   const navItems = [
     { to: "/admin/dashboard", label: "Overview", icon: <LayoutDashboard size={20}/> },
-    { to: "/admin/users", label: "Manage Users", icon: <Users size={20}/> },
+    { to: "/admin/users", label: "Manage Users", icon: <UserCog size={20}/> },
     { to: "/admin/videos", label: "Video Moderation", icon: <Video size={20}/> },
-    { to: "/admin/profiles", label: "Audit Logs", icon: <Users size={20}/> },
+    { to: "/admin/profiles", label: "Profile Manager", icon: <Users size={20}/> },
+    { to: "/admin/interactions", label: "Interaction Manager", icon: <Activity size={20}/> },
+    { to: "", label: "Payment", icon: <BadgeIndianRupee size={20}/> },
     { to: "/dashboard", label: "User View", icon: <Settings size={20}/> }, // Switch back to user view
   ];
 

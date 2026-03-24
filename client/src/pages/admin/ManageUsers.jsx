@@ -50,7 +50,7 @@ const ManageUsers = () => {
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h1 className="text-2xl font-bold">User Management</h1>
+                <h1 className="text-2xl font-bold flex items-center gap-2"><UserCog className="text-primary" />User Management</h1>
                 <div className="relative w-full md:w-72">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted" size={18} />
                     <input 

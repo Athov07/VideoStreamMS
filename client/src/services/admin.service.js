@@ -57,5 +57,21 @@ export const adminService = {
             getHeaders()
         );
         return res.data;
+    },
+
+    getVideoStats: async (videoId) => {
+        const response = await axios.get(
+            `${API_URL}/interactions/admin/video-stats/${videoId}`, 
+            getHeaders()
+        );
+        return response.data;
+    },
+
+    getAllVideoStats: async () => {
+        const response = await axios.get(
+            `${API_URL}/interactions/admin/all-stats`, 
+            getHeaders()
+        );
+        return response.data;
     }
 };
