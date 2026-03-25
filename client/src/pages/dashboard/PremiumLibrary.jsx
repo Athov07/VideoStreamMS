@@ -35,7 +35,7 @@ const PremiumLibrary = () => {
   return (
     <div className="animate-in fade-in duration-500">
       <div className="mb-8 border-b border-yellow-500/30 pb-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-yellow-500">✨ Premium Pro Library</h1>
+        <h1 className="text-2xl font-bold text-yellow-500">Premium Pro Library</h1>
         <span className="text-xs bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full border border-yellow-500/20">
           {filteredVideos.length} Exclusive Videos
         </span>

@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useOutletContext, Link } from 'react-router-dom';
+import { useOutletContext, Link, useNavigate } from 'react-router-dom';
 import { videoService } from '../../services/video.service.js';
 
 const Home = () => {
-  const { searchQuery } = useOutletContext();
+  // 1. Get isPremium from DashboardLayout context
+  const { searchQuery, isPremium: userIsPremium } = useOutletContext();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         const response = await videoService.getAllVideos();
-        
         if (response.success) {
           setVideos(response.data);
         }
@@ -21,14 +22,21 @@ const Home = () => {
         setLoading(false);
       }
     };
-
     fetchVideos();
   }, []);
 
-  // Filter real videos based on the search query from Navbar
   const filteredVideos = videos.filter(video =>
-    video.title.toLowerCase().includes(searchQuery.toLowerCase())
+    video.title.toLowerCase().includes(searchQuery?.toLowerCase() || "")
   );
+
+  // 2. Handler to check access before navigating
+  const handleVideoClick = (e, video) => {
+    if (video.isPremium && !userIsPremium) {
+      e.preventDefault(); // Stop the <Link> from working
+      alert("This is a Premium video. Please upgrade your plan to watch!");
+      navigate("/dashboard/premium");
+    }
+  };
 
   if (loading) {
     return (
@@ -49,8 +57,12 @@ const Home = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredVideos.map(video => (
-          <Link to={`/watch/${video._id}`} key={video._id} className="group cursor-pointer">
-            {/* Card Thumbnail - Real Cloudinary Image */}
+          <Link 
+            to={`/watch/${video._id}`} 
+            key={video._id} 
+            className="group cursor-pointer"
+            onClick={(e) => handleVideoClick(e, video)} // 3. Added click interceptor
+          >
             <div className="aspect-video bg-surface rounded-lg mb-3 border border-background-accent overflow-hidden relative transition-transform duration-200 group-hover:scale-[1.02]">
               <img 
                 src={video.thumbnailUrl || 'https://via.placeholder.com/300x200?text=Processing...'} 
@@ -58,18 +70,24 @@ const Home = () => {
                 className="w-full h-full object-cover"
               />
               
-              {/* Duration (if you add this field later, otherwise static/hidden) */}
               <div className="absolute bottom-2 right-2 bg-background/90 text-surface-text px-2 py-0.5 rounded text-[10px] font-bold">
                  {video.duration || "Video"}
               </div>
+
+              {/* 4. Visual lock overlay for non-premium users */}
+              {video.isPremium && !userIsPremium && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
+                   <span className="bg-red-700 text-black text-[10px] font-bold px-2 py-1 rounded shadow-lg">
+                     LOCK
+                   </span>
+                </div>
+              )}
             </div>
 
-            {/* Title */}
             <h3 className="font-semibold text-surface-text group-hover:text-primary transition-colors line-clamp-2 text-sm">
               {video.title}
             </h3>
 
-            {/* Category / Meta Data */}
             <div className="flex justify-between items-center mt-1">
                <span className="text-xs text-surface-muted block">
                  {video.category || "General"}
