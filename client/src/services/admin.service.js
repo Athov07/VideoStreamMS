@@ -122,4 +122,9 @@ export const adminService = {
     );
     return res.data;
   },
+
+  getAllPayments: async () => {
+    const res = await axios.get(`${API_URL}/payments/all`, getHeaders());
+    return res.data;
+  },
 };
