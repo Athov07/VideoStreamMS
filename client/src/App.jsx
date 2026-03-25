@@ -20,6 +20,8 @@ import ManageUsers from "./pages/admin/ManageUsers"
 import AdminContent from "./pages/admin/AdminContent"
 import ManageProfiles from './pages/admin/ManageProfiles';
 import ManageInteractions from './pages/admin/ManageInteractions';
+import Subscription from "./pages/dashboard/Subscription";
+import PremiumLibrary from './pages/dashboard/PremiumLibrary';
 
 
 function App() {
@@ -44,6 +46,8 @@ function App() {
                 path="/dashboard/profile"
                 element={<Profile/>}
               />
+              <Route path="/dashboard/premium" element={<Subscription />} />
+              <Route path="/dashboard/premium-content" element={<PremiumLibrary />} />
               <Route path="/watch/:id" element={<VideoDetails />} />
             </Route>
           </Route>

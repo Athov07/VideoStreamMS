@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { Plan } from "../models/plan.model.js";
 import { Subscription } from "../models/subscription.model.js";
 import * as paymentService from "../services/payment.service.js";
@@ -9,14 +11,27 @@ export const checkout = async (req, res) => {
   if (!plan) throw new ApiError(404, "Plan not found");
 
   const order = await paymentService.createRazorpayOrder(plan.price);
-  res.status(200).json({ success: true, order, plan });
+  res
+    .status(200)
+    .json({
+      success: true,
+      order,
+      plan,
+      razorpay_key: process.env.RAZORPAY_KEY_ID,
+    });
 };
 
 export const verifyPayment = async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planId } = req.body;
-  const userId = req.user.id; // From Auth Middleware
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planId } =
+    req.body;
+  const userId = req.user.id; 
+  // await User.findByIdAndUpdate(userId, { isPremium: true });
 
-  const isValid = paymentService.verifyRazorpaySignature(razorpay_order_id, razorpay_payment_id, razorpay_signature);
+  const isValid = paymentService.verifyRazorpaySignature(
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+  );
 
   if (!isValid) throw new ApiError(400, "Invalid signature, payment failed");
 
@@ -28,8 +43,10 @@ export const verifyPayment = async (req, res) => {
     userId,
     planId,
     expiryDate,
-    status: "active"
+    status: "active",
   });
 
-  res.status(200).json({ success: true, message: "Subscription activated", subscription });
+  res
+    .status(200)
+    .json({ success: true, message: "Subscription activated", subscription });
 };

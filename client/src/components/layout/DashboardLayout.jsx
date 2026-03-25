@@ -1,32 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/auth.service';
+import { paymentService } from '../../services/payment.service';
 import { 
   Home, 
   Video, 
   User as UserIcon, 
   LogOut, 
   Search,
-  PlaySquare
+  PlaySquare,
+  BadgeIndianRupee
 } from 'lucide-react';
 
 const DashboardLayout = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   
-  // Get real user data from your service
   const user = authService.getCurrentUser();
 
+  // --- Logic to sync Premium Status with Backend ---
+  useEffect(() => {
+    const checkPremium = async () => {
+      try {
+        const response = await paymentService.getSubscriptionStatus();
+        // matches your backend checkStatus controller: { success: true, isPremium: true }
+        if (response.success && response.isPremium) {
+          setIsPremium(true);
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        setIsPremium(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      checkPremium();
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
   const handleLogout = () => {
-    authService.logout(); // Uses the service method we added earlier
+    authService.logout();
     navigate('/login');
   };
 
+  // Dynamic Navigation Items
   const navItems = [
     { to: "/dashboard", label: "Home", icon: <Home size={20}/>, end: true },
     { to: "/dashboard/my-videos", label: "My Videos", icon: <Video size={20}/>, end: false },
     { to: "/dashboard/profile", label: "Profile", icon: <UserIcon size={20}/>, end: false },
+    
+    // Toggle between Upgrade and Library based on isPremium state
+    isPremium ? { 
+      to: "/dashboard/premium-content", 
+      label: "Premium Library", 
+      icon: <PlaySquare size={20} className="text-yellow-500" />, 
+      end: false 
+    } : { 
+      to: "/dashboard/premium", 
+      label: "Upgrade to Pro", 
+      icon: <BadgeIndianRupee size={20} />, 
+      end: false 
+    },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background text-primary">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-background text-surface-text font-sans">
@@ -95,7 +144,14 @@ const DashboardLayout = () => {
           <div className="flex items-center gap-4 ml-4">
             <div className="text-right hidden sm:block">
               <p className="text-[10px] text-surface-muted uppercase font-bold tracking-widest">Logged in as</p>
-              <p className="text-sm font-medium">{user?.firstName || 'User'}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium">{user?.firstName || 'User'}</p>
+                {isPremium && (
+                  <span className="text-[10px] bg-yellow-500/20 text-yellow-500 border border-yellow-500/50 px-1.5 py-0.5 rounded font-bold">
+                    PRO
+                  </span>
+                )}
+              </div>
             </div>
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 shadow-lg text-primary font-bold text-sm">
               {user?.email?.substring(0, 2).toUpperCase() || 'VS'}
@@ -105,7 +161,8 @@ const DashboardLayout = () => {
 
         {/* --- Main Content Outlet --- */}
         <main className="flex-1 overflow-y-auto p-8 bg-background custom-scrollbar">
-          <Outlet context={{ searchQuery }} />
+          {/* We pass isPremium via Context so sub-pages can use it */}
+          <Outlet context={{ searchQuery, isPremium }} />
         </main>
       </div>
     </div>

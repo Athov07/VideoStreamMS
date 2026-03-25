@@ -73,5 +73,21 @@ export const adminService = {
             getHeaders()
         );
         return response.data;
+    },
+
+    // --- Payment Service Admin Calls ---
+    createPlan: async (planData) => {
+        const res = await axios.post(`${API_URL}/payments/plans`, planData, getHeaders());
+        return res.data;
+    },
+
+    deletePlan: async (planId) => {
+        const res = await axios.delete(`${API_URL}/payments/plans/${planId}`, getHeaders());
+        return res.data;
+    },
+
+    getPaymentAuditLogs: async () => {
+        const res = await axios.get(`${API_URL}/payments/admin/audit-logs`, getHeaders());
+        return res.data;
     }
 };

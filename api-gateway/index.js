@@ -93,6 +93,19 @@ const adminAuthProxy = createProxyMiddleware({
 });
 
 
+// Payment Service Proxy
+const paymentProxy = createProxyMiddleware({
+  target: process.env.PAYMENT_SERVICE_URL || 'http://localhost:7000',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api/payments': '', // Strips '/api/payments'
+  },
+  onProxyReq: (proxyReq, req) => {
+    console.log(`[Gateway]: Payment Action -> ${req.method} ${proxyReq.path}`);
+  }
+});
+
+
 // Apply Proxy
 
 app.use('/api/auth', authProxy);
@@ -106,6 +119,8 @@ app.use('/api/subscription', subscriptionProxy);
 app.use('/api/interactions', interactionProxy);
 
 app.use('/api/admin', adminAuthProxy);
+
+app.use('/api/payments', paymentProxy);
 
 
 

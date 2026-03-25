@@ -27,9 +27,9 @@ export const getVideoById = asyncHandler(async (req, res) => {
     const video = await videoService.getVideoById(req.params.id);
     if (!video) throw new ApiError(404, "Video not found");
 
-    if (video.isPremium && !req.user.isPremium) {
-        throw new ApiError(403, "This is premium content. Please upgrade your plan.");
-    }
+    // if (video.isPremium && !req.user.isPremium) {
+    //     throw new ApiError(403, "This is premium content. Please upgrade your plan.");
+    // }
 
     res.status(200).json({ success: true, data: video });
 });

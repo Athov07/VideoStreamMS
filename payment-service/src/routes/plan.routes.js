@@ -5,7 +5,7 @@ import { verifyAdmin } from "../middlewares/admin.middleware.js";
 
 const router = Router();
 
-router.get("/", getPlans); // Public: Users see plans to buy
 router.post("/", verifyJWT, verifyAdmin, createPlan); // Admin only
+router.get("/", getPlans); // Public: Users see plans to buy
 
 export default router;
