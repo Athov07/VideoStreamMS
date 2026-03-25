@@ -11,7 +11,8 @@ import {
   Settings,
   UserCog,
   Activity,
-  BadgeIndianRupee
+  BadgeIndianRupee,
+  Tickets
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -30,7 +31,8 @@ const AdminLayout = () => {
     { to: "/admin/videos", label: "Video Moderation", icon: <Video size={20}/> },
     { to: "/admin/profiles", label: "Profile Manager", icon: <Users size={20}/> },
     { to: "/admin/interactions", label: "Interaction Manager", icon: <Activity size={20}/> },
-    { to: "", label: "Payment", icon: <BadgeIndianRupee size={20}/> },
+    { to: "/admin/plans", label: "Manage Plans", icon: <Tickets size={20}/> },
+    { to: "/admin/payments", label: "Manage Payments", icon: <BadgeIndianRupee size={20}/> },
     { to: "/dashboard", label: "User View", icon: <Settings size={20}/> }, // Switch back to user view
   ];
 
@@ -39,10 +41,10 @@ const AdminLayout = () => {
       {/* --- ADMIN SIDEBAR --- */}
       <aside className="w-64 bg-surface border-r border-background-accent flex flex-col">
         <div className="p-6">
-          <Link to="/admin/dashboard" className="text-2xl font-bold text-red-500 tracking-tight">
+          <Link to="/admin/dashboard" className="text-2xl font-bold text-blue-700">
             Admin<span className="text-primary">Panel</span>
           </Link>
-          <div className="mt-2 inline-block px-2 py-1 bg-red-500/10 text-red-500 text-[10px] font-bold rounded uppercase">
+          <div className="mt-2 inline-block px-2 py-1 bg-red-600/10 text-red-600 text-[10px] rounded uppercase">
             Superuser Access
           </div>
         </div>

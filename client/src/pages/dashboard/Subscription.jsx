@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Import navigate
 import { paymentService } from '../../services/payment.service';
 import { authService } from '../../services/auth.service'; // 1. Import authService
 import PlanCard from '../dashboard/PlanCard';
+import { BadgeIndianRupee } from "lucide-react";
 
 const Subscription = () => {
   const [plans, setPlans] = useState([]);
@@ -66,7 +67,7 @@ const Subscription = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8">Upgrade to Premium</h1>
+      <h1 className="text-3xl font-bold mb-8 flex align-center gap-3"><BadgeIndianRupee className='text-primary' size={35}/>Upgrade to Premium</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map(plan => (
           <PlanCard key={plan._id} plan={plan} onBuy={handlePayment} />

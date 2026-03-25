@@ -22,6 +22,7 @@ import ManageProfiles from './pages/admin/ManageProfiles';
 import ManageInteractions from './pages/admin/ManageInteractions';
 import Subscription from "./pages/dashboard/Subscription";
 import PremiumLibrary from './pages/dashboard/PremiumLibrary';
+import ManagePlans from "./pages/admin/ManagePlans"
 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
               <Route path="/admin/videos" element={<AdminContent />} />
               <Route path="/admin/profiles" element={<ManageProfiles />} />
               <Route path="/admin/interactions" element={<ManageInteractions />} />
+              <Route path="/admin/plans" element={<ManagePlans />} />
             </Route>
           </Route>
 

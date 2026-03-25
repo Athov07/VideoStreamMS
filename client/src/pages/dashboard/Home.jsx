@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, Link, useNavigate } from 'react-router-dom';
 import { videoService } from '../../services/video.service.js';
+import { ListVideo } from "lucide-react";
 
 const Home = () => {
   // 1. Get isPremium from DashboardLayout context
@@ -49,7 +50,7 @@ const Home = () => {
   return (
     <div className="animate-in fade-in duration-300">
       <div className="mb-8 border-b border-background-accent pb-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-surface-text">Browse Library</h1>
+        <h1 className="text-2xl font-bold text-surface-text flex align-center gap-3"><ListVideo className='text-primary' size={35}/>Browse Library</h1>
         <span className="text-xs text-surface-muted uppercase tracking-widest bg-background-secondary px-3 py-1 rounded">
           {filteredVideos.length} Results
         </span>
