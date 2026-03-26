@@ -8,6 +8,7 @@ import { AuditLog } from "../models/auditLog.model.js";
 import logger from "../utils/logger.js";
 import { Payment } from "../models/payment.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { emitPaymentEvent } from '../services/kafka.service.js';
 
 export const checkout = async (req, res) => {
   const { planId } = req.body;
@@ -133,6 +134,16 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     status: "success",
   });
 
+  // --- 🔥 KAFKA TRIGGER ---
+  // We "shout" to the system that John Doe is now a Premium member
+  await emitPaymentEvent('payment-events', {
+    userId: userId,
+    planId: planId,
+    status: 'success',
+    expiryDate: expiryDate,
+    action: 'UPGRADE_TO_PREMIUM'
+  });
+
   // 5. Audit Log (Existing logic)
   await AuditLog.create({
     action: "SUBSCRIPTION_ACTIVATED",
@@ -167,3 +178,6 @@ export const getAllPayments = asyncHandler(async (req, res) => {
         data: payments
     });
 });
+
+
+
