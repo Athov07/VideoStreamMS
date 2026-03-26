@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useOutletContext } from "react-router-dom";
 import { videoService } from "../../services/video.service.js";
 import { profileService } from "../../services/profile.service.js"; 
 import { subscriptionService } from "../../services/subscription.service.js";
-import { Play, Loader2, Eye, Calendar } from "lucide-react";
+import { Play, Loader2, Eye, Calendar, Lock } from "lucide-react";
 import LikeButtons from "../dashboard/VideoInteractions.jsx";
 import CommentSection from "../dashboard/CommentSection.jsx";
 
 const VideoDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  
+  // 1. Get user premium status from context (same as Home page)
+  const { isPremium: userIsPremium } = useOutletContext();
 
   const [video, setVideo] = useState(null);
   const [channel, setChannel] = useState(null);
@@ -31,6 +35,15 @@ const VideoDetails = () => {
     return { headers: { Authorization: token ? `Bearer ${token}` : "" } };
   };
 
+  // 2. Click Interceptor for sidebar items
+  const handleSidebarClick = (e, rec) => {
+    if (rec.isPremium && !userIsPremium) {
+      e.preventDefault();
+      alert("This is a Premium video. Please upgrade your plan to watch!");
+      navigate("/dashboard/premium");
+    }
+  };
+
   useEffect(() => {
     const fetchFullData = async () => {
       try {
@@ -38,6 +51,13 @@ const VideoDetails = () => {
         const videoRes = await videoService.getVideoById(id);
 
         if (videoRes.success) {
+          // 3. Security Check: If user manually types URL or refreshes on a Premium video
+          if (videoRes.data.isPremium && !userIsPremium) {
+            alert("This is a Premium video. Redirecting to plans...");
+            navigate("/dashboard/premium");
+            return;
+          }
+
           setVideo(videoRes.data);
           const ownerId = videoRes.data.owner?._id || videoRes.data.owner?.$oid || videoRes.data.owner;
 
@@ -65,7 +85,7 @@ const VideoDetails = () => {
       }
     };
     fetchFullData();
-  }, [id]);
+  }, [id, userIsPremium, navigate]); // Added dependencies for safety
 
   useEffect(() => {
     const hydrateSidebarNames = async () => {
@@ -126,11 +146,10 @@ const VideoDetails = () => {
         </div>
 
         <div className="mt-8">
-          {/* Title */}
           <h1 className="text-lg lg:text-lg font-medium text-white tracking-tight">
             {video.title}
           </h1>
-            <LikeButtons videoId={id} />
+          <LikeButtons videoId={id} />
 
           {/* PROFILE BAR */}
           <div className="mt-6 py-6 border-t border-b border-white/10 flex items-center justify-between">
@@ -146,7 +165,6 @@ const VideoDetails = () => {
                   {channel?.subscriberCount ?? 0} subscribers
                 </p>
               </div>
-              
             </div>
 
             {channel && channel.isMe === false && (
@@ -159,7 +177,6 @@ const VideoDetails = () => {
             )}
           </div>
 
-          {/* Description Box */}
           <div className="mt-8 p-6 bg-zinc-900/40 rounded-2xl border border-white/5">
             <div className="flex gap-6 text-[11px] font-normal text-zinc-500 mb-4 tracking-widest uppercase">
               <span className="flex items-center gap-2"><Eye size={14} className="text-primary" /> {video.views?.toLocaleString()} views</span>
@@ -171,7 +188,7 @@ const VideoDetails = () => {
         </div>
       </div>
 
-      {/* Sidebar */}
+      {/* Sidebar - Updated with Logic */}
       <div className="w-full lg:w-[420px] flex flex-col gap-6">
         <h2 className="text-[15px] font-normal text-[#F1F1F1] uppercase tracking-[0.3em] mb-2 flex items-center gap-2">
           <Play size={20} className="text-primary fill-primary" /> Up Next
@@ -181,13 +198,37 @@ const VideoDetails = () => {
             const recOwnerId = String(rec.owner?._id || rec.owner?.$oid || rec.owner || "");
             const mainAuthId = String(channel?.userId || "");
             const ownerName = (recOwnerId === mainAuthId) ? channel.username : (extraNames[recOwnerId] || "Creator");
+            
+            // Sidebar access check logic
+            const isLocked = rec.isPremium && !userIsPremium;
+
             return (
-              <Link key={rec._id} to={`/watch/${rec._id}`} className="flex gap-4 group hover:bg-white/5 p-2 rounded-2xl transition-all duration-300">
-                <div className="w-40 aspect-video rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0 border border-white/5 shadow-lg">
+              <Link 
+                key={rec._id} 
+                to={`/watch/${rec._id}`} 
+                onClick={(e) => handleSidebarClick(e, rec)} // Interceptor Added
+                className="flex gap-4 group hover:bg-white/5 p-2 rounded-2xl transition-all duration-300 relative"
+              >
+                <div className="w-40 aspect-video rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0 border border-white/5 shadow-lg relative">
                   <img src={rec.thumbnailUrl} alt={rec.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  
+                  {/* Visual Lock Overlay for Sidebar */}
+                  {isLocked && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[1px]">
+                      <Lock size={18} className="text-white opacity-80" />
+                    </div>
+                  )}
                 </div>
+                
                 <div className="flex-1 min-w-0 flex flex-col justify-center">
-                  <h4 className="text-sm font-medium text-[#F1F1F1] line-clamp-2 leading-snug group-hover:text-primary transition-colors">{rec.title}</h4>
+                  <div className="flex items-start justify-between gap-1">
+                    <h4 className="text-sm font-medium text-[#F1F1F1] line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+                      {rec.title}
+                    </h4>
+                    {rec.isPremium && (
+                      <span className="text-[8px] text-yellow-500 font-bold border border-yellow-500 px-1 rounded flex-shrink-0">PRO</span>
+                    )}
+                  </div>
                   <p className="text-[10px] text-zinc-400 mt-2 font-normal uppercase tracking-[0.2em] truncate group-hover:text-white transition-colors">{ownerName}</p>
                   <p className="text-[9px] text-zinc-600 mt-1 font-normal uppercase tracking-tight">{formatDate(rec.createdAt)}</p>
                 </div>
