@@ -18,10 +18,12 @@ app.use(morgan('dev'));
 const authProxy = createProxyMiddleware({
   target: process.env.AUTH_SERVICE_URL,
   changeOrigin: true,
+  xfwd: true,
   pathRewrite: {
     '^/api/auth': '', // Strips '/api/auth'
   },
   onProxyReq: (proxyReq, req, res) => {
+    proxyReq.setHeader('X-Forwarded-Host', 'localhost:8000');
     console.log(`[Gateway]: Forwarding ${req.method} ${req.url} -> ${process.env.AUTH_SERVICE_URL}${proxyReq.path}`);
   }
 });
