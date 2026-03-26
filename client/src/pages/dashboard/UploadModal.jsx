@@ -40,11 +40,20 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-surface border border-background-accent w-full max-w-lg p-8 rounded-2xl shadow-2xl relative">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-start sm:items-center justify-center z-50 p-4 overflow-y-auto">
+      {/* CSS to hide scrollbar */}
+      <style>
+        {`
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+          .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}
+      </style>
+
+      <div className="bg-surface border border-background-accent w-full max-w-lg p-6 sm:p-8 rounded-2xl shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto no-scrollbar">
+        
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-surface-muted hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-surface-muted hover:text-white transition-colors z-10"
         >
           <X size={20} />
         </button>
@@ -63,6 +72,7 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
               type="text"
               placeholder="e.g. My Amazing Travel Vlog"
               required
+              value={formData.title}
               className="w-full bg-background border border-background-accent p-3 rounded-xl text-surface-text focus:border-primary outline-none transition-all"
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
@@ -72,6 +82,7 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
             <label className="text-xs font-semibold text-surface-muted uppercase tracking-wider">Description</label>
             <textarea
               placeholder="Tell viewers about your video..."
+              value={formData.description}
               className="w-full bg-background border border-background-accent p-3 rounded-xl text-surface-text h-32 focus:border-primary outline-none transition-all resize-none"
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
@@ -102,7 +113,7 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
               onChange={(e) => setFile(e.target.files[0])}
             />
             <Film className="text-surface-muted group-hover:text-primary transition-colors" size={32} />
-            <p className="text-sm font-medium text-surface-text text-center">
+            <p className="text-sm font-medium text-surface-text text-center break-all">
               {file ? file.name : "Click to select or drag video file"}
             </p>
             <p className="text-[10px] text-surface-muted">MP4, MKV or MOV (Max 100MB)</p>
@@ -117,10 +128,11 @@ const UploadModal = ({ isOpen, onClose, onSuccess }) => {
               Cancel
             </button>
             <button
+              type="submit"
               disabled={uploading}
               className="flex-[2] bg-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
             >
-              {uploading ? "Uploading to Cloud..." : "Publish Video"}
+              {uploading ? "Uploading..." : "Publish Video"}
             </button>
           </div>
         </form>
