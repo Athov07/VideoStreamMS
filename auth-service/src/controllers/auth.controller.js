@@ -7,6 +7,7 @@ import ApiError from "../utils/ApiError.js";
 import { CLIENT_URLS } from "../constants/index.js";
 import { AuditLog } from "../models/auditLog.model.js";
 import mongoose from "mongoose";
+import { emitAuthEvent } from "../services/kafka.service.js";
 
 // 1. Send OTP to Gmail
 export const sendOtpController = asyncHandler(async (req, res) => {
@@ -20,18 +21,22 @@ export const sendOtpController = asyncHandler(async (req, res) => {
   const existingUser = await User.findOne({ email: normalizedEmail });
 
   // 3. AUDIT LOG: Initial OTP Request
-    await AuditLog.create({
-        userId: existingUser ? existingUser._id : new mongoose.Types.ObjectId("000000000000000000000000"),
-        action: "AUTH_OTP_REQUEST_SEND",
-        resourceId: existingUser ? existingUser._id : new mongoose.Types.ObjectId("000000000000000000000000"),
-        resourceType: "User",
-        details: { 
-            email: normalizedEmail,
-            isExistingUser: !!existingUser,
-            ip: req.ip,
-            userAgent: req.get('User-Agent')
-        }
-    });
+  await AuditLog.create({
+    userId: existingUser
+      ? existingUser._id
+      : new mongoose.Types.ObjectId("000000000000000000000000"),
+    action: "AUTH_OTP_REQUEST_SEND",
+    resourceId: existingUser
+      ? existingUser._id
+      : new mongoose.Types.ObjectId("000000000000000000000000"),
+    resourceType: "User",
+    details: {
+      email: normalizedEmail,
+      isExistingUser: !!existingUser,
+      ip: req.ip,
+      userAgent: req.get("User-Agent"),
+    },
+  });
   res.status(200).json({ success: true, message: "OTP sent to email" });
 });
 
@@ -48,6 +53,12 @@ export const verifyOtpController = asyncHandler(async (req, res) => {
     user = await User.create({
       email: email.toLowerCase(),
       isVerified: true,
+    });
+
+    // KAFKA EMIT
+    await emitAuthEvent("USER_CREATED_PENDING", {
+      userId: user._id,
+      email: user.email,
     });
 
     // AUDIT LOG: Initial user creation
@@ -111,6 +122,15 @@ export const registerController = asyncHandler(async (req, res) => {
   user.isVerified = true;
 
   await user.save();
+
+  // KAFKA EMIT
+  await emitAuthEvent("USER_REGISTERED", {
+    userId: user._id,
+    email: user.email,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  });
 
   const tokens = tokenService.generateTokens(user);
 
@@ -217,17 +237,17 @@ export const resendOtpController = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email: email.toLowerCase() });
 
   //AUDIT LOG: Resend Request
-    await AuditLog.create({
-        userId: user ? user._id : new mongoose.Types.ObjectId(), 
-        action: "AUTH_OTP_RESEND",
-        resourceId: user ? user._id : new mongoose.Types.ObjectId(),
-        resourceType: "User",
-        details: { 
-            email: email.toLowerCase(),
-            reason: "User requested new OTP",
-            ip: req.ip 
-        }
-    });
+  await AuditLog.create({
+    userId: user ? user._id : new mongoose.Types.ObjectId(),
+    action: "AUTH_OTP_RESEND",
+    resourceId: user ? user._id : new mongoose.Types.ObjectId(),
+    resourceType: "User",
+    details: {
+      email: email.toLowerCase(),
+      reason: "User requested new OTP",
+      ip: req.ip,
+    },
+  });
 
   res.status(200).json({
     success: true,

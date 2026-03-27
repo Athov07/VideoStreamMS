@@ -1,11 +1,21 @@
 import { videoService } from '../services/video.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
+import { emitVideoEvent } from "../services/kafka.service.js";
 
 export const uploadVideo = asyncHandler(async (req, res) => {
     if (!req.file) throw new ApiError(400, "Video file is required");
     
     const video = await videoService.createVideo(req.body, req.file, req.user._id);
+
+    // KAFKA EMIT
+    await emitVideoEvent({
+        action: "VIDEO_PUBLISHED",
+        videoId: video._id,
+        ownerId: req.user._id,
+        title: video.title
+    });
+
     res.status(201).json({ success: true, data: video });
 });
 
