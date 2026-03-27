@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { logger } from "../utils/logger.js";
 import { AuditLog } from "../models/auditLog.model.js";
+import { emitInteractionEvent } from "../services/kafka.service.js";
 
 export const postComment = asyncHandler(async (req, res) => {
     const { videoId, content, parentId } = req.body;
@@ -16,6 +17,14 @@ export const postComment = asyncHandler(async (req, res) => {
         parentId: parentId || null,
         userId: req.user.id,
         username: req.user.username // Passed from JWT
+    });
+
+    // --- KAFKA EMIT ---
+    await emitInteractionEvent({
+        videoId,
+        type: "comment",
+        action: "added",
+        commentId: comment._id
     });
 
     // Audit Log
@@ -81,7 +90,16 @@ export const deleteComment = asyncHandler(async (req, res) => {
         throw new ApiError(403, "Unauthorized to delete");
     }
 
+    const videoId = comment.videoId;
+
     await Comment.deleteMany({ $or: [{ _id: commentId }, { parentId: commentId }] });
+
+    // --- KAFKA EMIT ---
+    await emitInteractionEvent({
+        videoId,
+        type: "comment",
+        action: "removed"
+    });
 
     // Audit Log
     await AuditLog.create({

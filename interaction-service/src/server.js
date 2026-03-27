@@ -3,29 +3,39 @@ dotenv.config();
 import connectDB from "./config/db.js";
 import { app } from "./app.js";
 import { logger } from "./utils/logger.js";
+import { connectProducer } from "./services/kafka.service.js"; 
 
 const PORT = process.env.PORT || 6500;
 
-// Connect to MongoDB then start server
-connectDB()
-    .then(() => {
-        app.on("error", (error) => {
-            logger.error(`Express Server Error: ${error}`);
-            throw error;
-        });
+const startServer = async () => {
+    try {
+        // 1. Connect to MongoDB
+        await connectDB();
+        logger.info("MongoDB connected successfully");
 
-        app.listen(PORT, () => {
+        // 2. Connect to Kafka Producer
+        await connectProducer();
+        logger.info("Kafka Producer connected successfully");
+
+        // 3. Start Express
+        const server = app.listen(PORT, () => {
             logger.info(`Interaction Service is running on port: ${PORT}`);
         });
-    })
-    .catch((err) => {
-        logger.error(`MongoDB connection failed: ${err.message}`);
-        process.exit(1);
-    });
 
-// Handle unhandled promise rejections
+        server.on("error", (error) => {
+            logger.error(`Express Server Error: ${error}`);
+        });
+
+    } catch (err) {
+        logger.error(`Startup failed: ${err.message}`);
+        process.exit(1);
+    }
+};
+
+startServer();
+
+// Global error handlers
 process.on("unhandledRejection", (err) => {
     logger.error(`Unhandled Rejection: ${err.message}`);
-    // Close server & exit process
     process.exit(1);
 });

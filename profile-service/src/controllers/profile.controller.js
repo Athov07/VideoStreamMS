@@ -1,6 +1,7 @@
 import { profileService } from "../services/profile.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
+import { emitProfileEvent } from "../services/kafka.service.js";
 
 
 // 1. Get or Create Profile
@@ -34,6 +35,14 @@ export const deleteMyProfile = asyncHandler(async (req, res) => {
 
     // 2. Call the service to handle DB deletion and Cloudinary cleanup
     const deletedProfile = await profileService.deleteProfile(userId);
+
+    if (deletedProfile) {
+        // KAFKA EMIT
+        await emitProfileEvent("profile-updates", {
+            userId,
+            action: "DELETE_PROFILE"
+        });
+    }
 
     if (!deletedProfile) {
         throw new ApiError(404, "Profile not found or already deleted");

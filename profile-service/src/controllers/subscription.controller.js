@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { logActivity } from "../utils/logger.js";
 import mongoose from "mongoose";
+import { emitProfileEvent } from "../services/kafka.service.js";
 
 
 export const toggleSubscription = asyncHandler(async (req, res) => {
@@ -32,6 +33,13 @@ export const toggleSubscription = asyncHandler(async (req, res) => {
         targetProfile.subscriberCount = Math.max(0, targetProfile.subscriberCount - 1);
         await targetProfile.save();
 
+        // KAFKA EMIT
+        await emitProfileEvent("subscription-events", {
+            subscriberId: subscriberUserId,
+            channelId: channelId,
+            action: "UNSUBSCRIBED"
+        });
+
         await logActivity(
             subscriberUserId, 
             'UNSUBSCRIBED', 
@@ -49,6 +57,13 @@ export const toggleSubscription = asyncHandler(async (req, res) => {
     
     targetProfile.subscriberCount += 1;
     await targetProfile.save();
+
+    // KAFKA EMIT
+        await emitProfileEvent("subscription-events", {
+            subscriberId: subscriberUserId,
+            channelId: channelId,
+            action: "SUBSCRIBED"
+        });
 
     await logActivity(
         subscriberUserId, 

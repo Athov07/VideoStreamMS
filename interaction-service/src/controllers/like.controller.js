@@ -2,6 +2,7 @@ import { Like } from "../models/like.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { logger } from "../utils/logger.js";
 import { AuditLog } from "../models/auditLog.model.js";
+import { emitInteractionEvent } from "../services/kafka.service.js";
 
 export const toggleLike = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
@@ -13,21 +14,25 @@ export const toggleLike = asyncHandler(async (req, res) => {
     if (existingInteraction) {
         if (existingInteraction.type === type) {
             await Like.findByIdAndDelete(existingInteraction._id);
+            await emitInteractionEvent({ videoId, type, action: "removed" });
             return res.status(200).json({ message: "Interaction removed" });
         }
+        const oldType = existingInteraction.type;
         existingInteraction.type = type;
         await existingInteraction.save();
+        await emitInteractionEvent({ videoId, type, oldType, action: "changed" });
         await AuditLog.create({
             userId,
             action: `CHANGE_TO_${type.toUpperCase()}`,
             resourceId: videoId,
             resourceType: "Video"
         });
+        
         return res.status(200).json({ message: `Changed to ${type}` });
     }
 
     await Like.create({ videoId, userId, type });
-
+    await emitInteractionEvent({ videoId, type, action: "added" });
     await AuditLog.create({
         userId,
         action: `${type.toUpperCase()}_VIDEO`,
