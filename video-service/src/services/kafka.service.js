@@ -1,9 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { Kafka } from "kafkajs";
 import { Video } from "../models/video.model.js";
 
 const kafka = new Kafka({
     clientId: "video-service",
-    brokers: ["localhost:9092"],
+    brokers: [process.env.KAFKA_BROKER || "localhost:9092"],
 });
 
 const producer = kafka.producer();
