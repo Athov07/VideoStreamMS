@@ -11,7 +11,13 @@ const app = express();
 
 // 1. Global Middleware
 app.use(helmet()); 
-app.use(cors());   
+app.use(cors({
+  origin: [
+    'http://localhost:5173', 
+    'https://your-app-name.vercel.app' 
+  ],
+  credentials: true
+}));   
 app.use(morgan('dev')); 
 
 // auth Proxy Routes
