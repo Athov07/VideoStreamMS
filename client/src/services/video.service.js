@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 // This points to your API Gateway
-const API_URL = 'http://localhost:8000/api/videos';
+// const API_URL = 'http://localhost:8000/api/videos';
+const API_URL = `${import.meta.env.VITE_API_GATEWAY_URL}/videos`;
 
 // Helper to get the token from local storage
 const getAuthHeader = () => {

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8000/api/payments';
+// const BASE_URL = 'http://localhost:8000/api/payments';
+const BASE_URL = `${import.meta.env.VITE_API_GATEWAY_URL}/payments`;
 
 const getHeaders = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` }
