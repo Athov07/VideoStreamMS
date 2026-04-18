@@ -1,41 +1,118 @@
 services:
+  # --- INFRASTRUCTURE ---
   kafka:
     image: confluentinc/cp-kafka:latest
-    container_name: videostreamms-kafka
+    container_name: kafka
     ports:
       - "9092:9092"
     environment:
-      # KRaft Settings
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: 'broker,controller'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@localhost:9093'
-      
-      # Listeners Configuration
-      # 29092 is for internal Docker communication (UI)
-      # 9092 is for your Windows host (Node.js)
       KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:9092'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
-      
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-      
-      # Required for KRaft Cluster
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
-      
-      # Stability Settings
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-  kafka-console:
+  kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: videostreamms-kafka-console
+    container_name: kafka-ui
     ports:
-      - "8080:8080"
+      - "8081:8080" # Moved to 8081 to avoid conflict with potential apps
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
+    depends_on:
+      - kafka
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  # --- API GATEWAY ---
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - AUTH_SERVICE_URL=http://auth-service:5100
+      - VIDEO_SERVICE_URL=http://video-service:5500
+      - PROFILE_SERVICE_URL=http://profile-service:6000
+      - INTERACTION_SERVICE_URL=http://interaction-service:6500
+      - PAYMENT_SERVICE_URL=http://payment-service:7000
+    depends_on:
+      - auth-service
+      - video-service
+      - profile-service
+      - interaction-service
+      - payment-service
+
+  # --- MICROSERVICES ---
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "5100:5100"
+    environment:
+      - PORT=5100
+      - KAFKA_BROKER=kafka:29092
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URI=${DATABASE_URL}
+    depends_on:
+      - kafka
+      - redis
+
+  video-service:
+    build: ./video-service
+    container_name: video-service
+    ports:
+      - "5500:5500"
+    environment:
+      - PORT=5500
+      - KAFKA_BROKER=kafka:29092
+      - MONGO_URI=${DATABASE_URL}
+    depends_on:
+      - kafka
+
+  profile-service:
+    build: ./profile-service
+    container_name: profile-service
+    ports:
+      - "6000:6000"
+    environment:
+      - PORT=6000
+      - KAFKA_BROKER=kafka:29092
+      - MONGO_URI=${DATABASE_URL}
+    depends_on:
+      - kafka
+
+  interaction-service:
+    build: ./interaction-service
+    container_name: interaction-service
+    ports:
+      - "6500:6500"
+    environment:
+      - PORT=6500
+      - KAFKA_BROKER=kafka:29092
+      - MONGO_URI=${DATABASE_URL}
+    depends_on:
+      - kafka
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "7000:7000"
+    environment:
+      - PORT=7000
+      - KAFKA_BROKER=kafka:29092
+      - MONGO_URI=${DATABASE_URL}
     depends_on:
       - kafka

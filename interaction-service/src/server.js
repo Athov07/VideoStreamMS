@@ -3,7 +3,7 @@ dotenv.config();
 import connectDB from "./config/db.js";
 import { app } from "./app.js";
 import { logger } from "./utils/logger.js";
-import { connectProducer } from "./services/kafka.service.js"; 
+import { connectProducer, connectWithRetry } from "./services/kafka.service.js"; 
 
 const PORT = process.env.PORT || 6500;
 
@@ -13,12 +13,13 @@ const startServer = async () => {
         await connectDB();
         logger.info("MongoDB connected successfully");
 
-        // 2. Connect to Kafka Producer
-        await connectProducer();
+        // 2. Connect to Kafka Producer with Retry
+        // This prevents the process.exit(1) from triggering during Kafka's startup
+        await connectWithRetry(connectProducer);
         logger.info("Kafka Producer connected successfully");
 
         // 3. Start Express
-        const server = app.listen(PORT, () => {
+        const server = app.listen(PORT,() => {
             logger.info(`Interaction Service is running on port: ${PORT}`);
         });
 
